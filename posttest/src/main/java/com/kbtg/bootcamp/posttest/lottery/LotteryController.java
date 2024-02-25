@@ -1,5 +1,8 @@
 package com.kbtg.bootcamp.posttest.lottery;
 
+import com.kbtg.bootcamp.posttest.user.TenDigitUser;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Pattern;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -30,5 +33,13 @@ public class LotteryController {
         LotteryResponse result = lotteryService.createLottery(request);
 
         return new ResponseEntity<>(result, HttpStatus.CREATED);
+    }
+
+    @PostMapping(value = "/users/{userId}/lotteries/{ticketId}")
+    public ResponseEntity<LotteryPurchaseReponse> purchaseTicket(
+            @PathVariable(value = "userId") @TenDigitUser String userId,
+            @PathVariable(value = "ticketId") @SixDigitTicket String ticketId){
+
+        return null;
     }
 }

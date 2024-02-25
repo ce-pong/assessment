@@ -8,7 +8,7 @@ import org.hibernate.validator.constraints.Length;
 public record LotteryDto(
 
         @NotEmpty(message = "ticket should not empty")
-                @Pattern(regexp = "\\d{6}",message = "ticket must be exactly 6 digits")
+                @SixDigitTicket
         String ticket,
 
         @Positive(message = "input price more than 0")

@@ -16,6 +16,9 @@ public class LotteryService {
         this.lotteryRepository = lotteryRepository;
     }
 
+    public Boolean checkValidTicket(String ticket){
+        return true;
+    }
     public LotteryListResponse getAvailableTicketIds() {
         try{
             List<Lottery> tickets = lotteryRepository.findByAmountMoreThanZero();
