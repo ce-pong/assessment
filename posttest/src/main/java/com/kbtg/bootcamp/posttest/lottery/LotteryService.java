@@ -8,7 +8,6 @@ import com.kbtg.bootcamp.posttest.user.User;
 import com.kbtg.bootcamp.posttest.user.UserRepository;
 import com.kbtg.bootcamp.posttest.user.UserTicket;
 import com.kbtg.bootcamp.posttest.user.UserTicketRepository;
-import org.apache.logging.log4j.util.PropertySource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,12 +29,6 @@ public class LotteryService {
         this.userRepository = userRepository;
     }
 
-    private List<Lottery> orderLotteryAscending(List<Lottery> lotteries){
-        List<Lottery> mutableList = new ArrayList<>(lotteries);
-        mutableList.sort(Comparator.comparingInt(lottery -> Integer.parseInt(lottery.getTicketId())));
-        return mutableList;
-    }
-
     public LotteryListResponse getAvailableTicketIds() {
         List<Lottery> lotteries;
         try{
@@ -44,7 +37,8 @@ public class LotteryService {
             throw new InternalServerException("Failed to get available ticket");
         }
 
-        List<String> ticketIds =  orderLotteryAscending(lotteries).stream()
+        List<String> ticketIds =  lotteries.stream()
+                .sorted(Comparator.comparingInt(lottery -> Integer.parseInt(lottery.getTicketId())))
                 .map(Lottery::getTicketId)
                 .collect(Collectors.toList());
 
@@ -69,13 +63,8 @@ public class LotteryService {
     @Transactional
     public LotteryPurchaseResponse purchaseLottery(String userId, String ticketId){
 
-        Optional<Lottery> optionalLottery = lotteryRepository.findById(ticketId);
-        Lottery lottery;
-        if(optionalLottery.isEmpty()){
-            throw new NotFoundException("Ticket "+ticketId+" not found");
-        }
-
-        lottery = optionalLottery.get();
+        Lottery lottery = lotteryRepository.findById(ticketId)
+                .orElseThrow(() -> new NotFoundException("Ticket "+ticketId+" not found"));
 
         if(lottery.getAmount() == 0){
             throw new LotteryRunOutException("Ticket "+ticketId+" has already been purchased");
@@ -106,5 +95,19 @@ public class LotteryService {
 
         String recordId = Integer.toString(userTicket.getId());
         return new LotteryPurchaseResponse(recordId);
+    }
+
+    public LotteryHistoryResponse getPurchaseHistory(String userId) {
+        List<UserTicket> userTickets = userTicketRepository.findByUserId(userId);
+
+        List<String> ticketIds = new ArrayList<>();
+        int sum = userTickets.stream()
+                .map(UserTicket::getLottery)
+                .sorted(Comparator.comparingInt(lottery -> Integer.parseInt(lottery.getTicketId())))
+                .peek(lottery -> ticketIds.add(lottery.getTicketId()))
+                .mapToInt(Lottery::getPrice)
+                .sum();
+
+        return new LotteryHistoryResponse(ticketIds,userTickets.size(),sum);
     }
 }

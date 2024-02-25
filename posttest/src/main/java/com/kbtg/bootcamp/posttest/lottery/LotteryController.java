@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 public class LotteryController {
 
-    private LotteryService lotteryService;
+    private final LotteryService lotteryService;
 
     public LotteryController(LotteryService lotteryService){
         this.lotteryService = lotteryService;
@@ -29,12 +29,22 @@ public class LotteryController {
         return  lotteryService.createLottery(request);
     }
 
+    @GetMapping(value = "/users/{userId}/lotteries")
+    @ResponseStatus(HttpStatus.OK)
+    public LotteryHistoryResponse getPurchaseHistory(
+            @PathVariable(value = "userId") @TenDigitUser String userId){
+
+        return lotteryService.getPurchaseHistory(userId);
+    }
+
     @PostMapping(value = "/users/{userId}/lotteries/{ticketId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public LotteryPurchaseResponse purchaseTicket(
+    public LotteryPurchaseResponse purchaseLottery(
             @PathVariable(value = "userId") @TenDigitUser String userId,
             @PathVariable(value = "ticketId") @SixDigitTicket String ticketId){
 
         return lotteryService.purchaseLottery(userId,ticketId);
     }
+
+
 }

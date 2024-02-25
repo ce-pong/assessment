@@ -182,4 +182,58 @@ class LotteryServiceTest {
         String expected = "1";
         assertEquals(expected,actual.id());
     }
+
+    @Test
+    @DisplayName("getPurchaseHistory with No Data Should Be Return Correct Response")
+    public void whenGetHistory_withNoData_ShouldBeReturnCorrectResponse(){
+
+        // Arrange
+        String userId = "0123456789";
+
+        when(userTicketRepository.findByUserId(userId)).thenReturn(List.of());
+
+        // Act
+        LotteryHistoryResponse actual = lotteryService.getPurchaseHistory(userId);
+
+        // Assert
+        List<String> expectedTicketIds = List.of();
+        assertEquals(expectedTicketIds, actual.tickets());
+
+        int expectedCountLottery = 0;
+        assertEquals(expectedCountLottery,actual.countLottery());
+
+        int expectTotalPrice = 0;
+        assertEquals(expectTotalPrice,actual.totalPrice());
+
+    }
+    @Test
+    @DisplayName("getPurchaseHistory Should Be Return Correct Response")
+    public void whenGetHistory_ShouldBeReturnCorrectResponse(){
+
+        // Arrange
+        String userId = "0123456789";
+        User user = new User(userId);
+
+        Lottery lottery1 = new Lottery("123456",100,1);
+        Lottery lottery2 = new Lottery("000002",80,1);
+        UserTicket userTicket1 = new UserTicket(lottery1,user);
+        userTicket1.setId(1);
+        UserTicket userTicket2 = new UserTicket(lottery2,user);
+        userTicket2.setId(2);
+        when(userTicketRepository.findByUserId(userId)).thenReturn(List.of(userTicket1,userTicket2));
+
+        // Act
+        LotteryHistoryResponse actual = lotteryService.getPurchaseHistory(userId);
+
+        // Assert
+        List<String> expectedTicketIds = List.of( "000002", "123456");
+        assertEquals(expectedTicketIds, actual.tickets());
+
+        int expectedCountLottery = 2;
+        assertEquals(expectedCountLottery,actual.countLottery());
+
+        int expectTotalPrice = 180;
+        assertEquals(expectTotalPrice,actual.totalPrice());
+
+    }
 }
