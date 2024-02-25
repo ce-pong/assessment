@@ -38,7 +38,7 @@ class LotteryControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    @DisplayName("Call Get Available Ticket Should Return Status Code 200 and Correct Lottery List Response")
+    @DisplayName("getAvailableTickets Should Return Status Code 200 and Correct Lottery List Response")
     public void getAvailableTickets_ShouldReturn200AndLotteryListResponse() throws Exception {
         // Arrange
         when(lotteryService.getAvailableTicketIds()).thenReturn(new LotteryListResponse(List.of("000001", "000002", "123456")));
@@ -54,8 +54,8 @@ class LotteryControllerTest {
     }
 
     @Test
-    @DisplayName("Handling Internal Server Error When Retrieving Available Tickets should return status code 500 and defined message")
-    public void whenInternalServerOccur_ShouldReturn500AndDefinedMessage() throws Exception {
+    @DisplayName("getAvailableTickets returns status 500 and error message on internal server error")
+    public void getAvailableTickets_OnInternalServerError_ShouldReturnStatus500AndErrorMessage() throws Exception {
 
         // Arrange
         when(lotteryService.getAvailableTicketIds()).thenThrow(new InternalServerException("Failed to get available ticket"));
@@ -67,7 +67,7 @@ class LotteryControllerTest {
     }
 
     @Test
-    @DisplayName("Create Lottery Attached Basic Auth (Admin) should return status code 201 and correct response")
+    @DisplayName("CreateLottery Attached Basic Auth (Admin) should return status code 201 and correct response")
     public void createTicket_ShouldReturn201AndResponseContainTicketId() throws Exception {
 
         // Arrange
@@ -87,7 +87,7 @@ class LotteryControllerTest {
     }
 
     @Test
-    @DisplayName("Create Lottery with invalid data should return status code 400")
+    @DisplayName("CreateLottery with invalid data should return status code 400")
     public void createTicket_withInvalidData_ShouldReturn400() throws Exception {
 
         // Arrange
@@ -101,7 +101,6 @@ class LotteryControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.message").value("Validation error"));
-
     }
 
 
