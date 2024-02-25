@@ -27,8 +27,8 @@ class LotteryDtoTest {
     }
 
     @Test
-    @DisplayName("when ticket is valid then no return violation")
-    void whenTicketIsValid_thenNoConstraintViolations() {
+    @DisplayName("Validating a valid ticket should result in no constraint violations")
+    void TicketValidation_ValidTicket_NoConstraintViolations()  {
 
         // Arrange
         String ticket = "000001";
@@ -41,8 +41,8 @@ class LotteryDtoTest {
         assertTrue(violations.isEmpty());
     }
     @Test
-    @DisplayName("when ticket is empty then return 2 violation")
-    void whenTicketIsEmpty_thenConstraintViolation() {
+    @DisplayName("Validating an empty ticket should result in two violations")
+    void TicketValidation_EmptyTicket_ReturnsTwoViolations() {
 
         // Arrange
         String ticket = "";
@@ -62,8 +62,8 @@ class LotteryDtoTest {
     }
 
     @Test
-    @DisplayName("when ticket is not 6 digit then return violation")
-    void whenTicketIsNot6Digits_thenConstraintViolation() {
+    @DisplayName("Validating a ticket that is not 6 digits should return a violation")
+    void TicketValidation_NonSixDigitTicket_ReturnsViolation() {
 
         // Arrange
         String ticket = "12345";

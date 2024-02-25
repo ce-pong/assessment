@@ -44,7 +44,7 @@ public class LotteryService {
 
         return new LotteryListResponse(ticketIds);
     }
-    public LotteryResponse createLottery(LotteryDto request){
+    public LotteryResponse addLottery(LotteryDto request){
         try{
             Lottery lottery = new Lottery();
             lottery.setTicketId(request.ticket());
@@ -109,5 +109,24 @@ public class LotteryService {
                 .sum();
 
         return new LotteryHistoryResponse(ticketIds,userTickets.size(),sum);
+    }
+
+    @Transactional
+    public LotterySellBackResponse sellBackLottery(String userId, String ticketId) {
+            List<UserTicket> userTickets = userTicketRepository.findByUserIdAndTicketId(userId,ticketId);
+
+            if(userTickets.isEmpty()){
+                throw new NotFoundException("Not found ticket "+ticketId+" for user "+userId);
+            }
+
+            try{
+                for(UserTicket userTicket : userTickets ){
+                    userTicketRepository.delete(userTicket);
+                }
+            }catch (Exception ex){
+                throw new InternalServerException("Failed to sell lottery back");
+            }
+
+            return new LotterySellBackResponse(ticketId);
     }
 }

@@ -1,6 +1,5 @@
 package com.kbtg.bootcamp.posttest.lottery;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kbtg.bootcamp.posttest.exception.InternalServerException;
 import com.kbtg.bootcamp.posttest.securityconfig.SecurityConfiguration;
@@ -15,7 +14,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.*;
 
 import java.util.List;
 
@@ -38,8 +36,8 @@ class LotteryControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    @DisplayName("getAvailableTickets Should Return Status Code 200 and Correct Lottery List Response")
-    public void getAvailableTickets_ShouldReturn200AndLotteryListResponse() throws Exception {
+    @DisplayName("getAvailableTickets should return status code 200 and correct lottery list response")
+    public void getAvailableTickets_Returns200AndCorrectLotteryListResponse()  throws Exception {
         // Arrange
         when(lotteryService.getAvailableTicketIds()).thenReturn(new LotteryListResponse(List.of("000001", "000002", "123456")));
 
@@ -55,7 +53,7 @@ class LotteryControllerTest {
 
     @Test
     @DisplayName("getAvailableTickets returns status 500 and error message on internal server error")
-    public void getAvailableTickets_OnInternalServerError_ShouldReturnStatus500AndErrorMessage() throws Exception {
+    public void getAvailableTickets_OnInternalServerError_ReturnsStatus500AndErrorMessage() throws Exception {
 
         // Arrange
         when(lotteryService.getAvailableTicketIds()).thenThrow(new InternalServerException("Failed to get available ticket"));
@@ -67,13 +65,13 @@ class LotteryControllerTest {
     }
 
     @Test
-    @DisplayName("CreateLottery Attached Basic Auth (Admin) should return status code 201 and correct response")
-    public void createTicket_ShouldReturn201AndResponseContainTicketId() throws Exception {
+    @DisplayName("CreateLottery with Basic Auth (Admin) should return status code 201 and correct response containing Ticket ID")
+    public void createLottery_WithAdminAuth_Returns201AndResponseWithTicketId()throws Exception {
 
         // Arrange
         LotteryDto request = new LotteryDto("000001",80,1);
         LotteryResponse expectedResponse = new LotteryResponse(request.ticket());
-        when(lotteryService.createLottery(request)).thenReturn(expectedResponse);
+        when(lotteryService.addLottery(request)).thenReturn(expectedResponse);
 
         // Act & Assert
         mockMvc.perform(post("/admin/lotteries")
@@ -88,7 +86,7 @@ class LotteryControllerTest {
 
     @Test
     @DisplayName("CreateLottery with invalid data should return status code 400")
-    public void createTicket_withInvalidData_ShouldReturn400() throws Exception {
+    public void createLottery_WithInvalidData_Returns400()throws Exception {
 
         // Arrange
         LotteryDto request = new LotteryDto("000001",0,0);

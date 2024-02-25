@@ -26,7 +26,7 @@ public class LotteryController {
     @ResponseStatus(HttpStatus.CREATED)
     public LotteryResponse createLottery(@RequestBody @Validated LotteryDto request){
 
-        return  lotteryService.createLottery(request);
+        return  lotteryService.addLottery(request);
     }
 
     @GetMapping(value = "/users/{userId}/lotteries")
@@ -44,6 +44,15 @@ public class LotteryController {
             @PathVariable(value = "ticketId") @SixDigitTicket String ticketId){
 
         return lotteryService.purchaseLottery(userId,ticketId);
+    }
+
+    @DeleteMapping(value = "/users/{userId}/lotteries/{ticketId}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public LotterySellBackResponse sellBackLottery(
+            @PathVariable(value = "userId") @TenDigitUser String userId,
+            @PathVariable(value = "ticketId") @SixDigitTicket String ticketId){
+
+        return lotteryService.sellBackLottery(userId,ticketId);
     }
 
 
