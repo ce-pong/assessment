@@ -18,25 +18,22 @@ public class LotteryController {
     }
 
     @GetMapping(value = "/lotteries")
-    public ResponseEntity<LotteryListResponse> getAvailableLottery(){
+    @ResponseStatus(value = HttpStatus.OK)
+    public LotteryListResponse getAvailableLottery(){
 
-        LotteryListResponse result = lotteryService.getAvailableTicketIds();
-
-        return ResponseEntity.ok(result);
+        return lotteryService.getAvailableTicketIds();
     }
 
     @PostMapping(value = "/admin/lotteries")
-    public ResponseEntity<LotteryResponse> createLottery(@RequestBody
-                                                          @Validated
-                                                          LotteryDto request){
+    @ResponseStatus(HttpStatus.CREATED)
+    public LotteryResponse createLottery(@RequestBody @Validated LotteryDto request){
 
-        LotteryResponse result = lotteryService.createLottery(request);
-
-        return new ResponseEntity<>(result, HttpStatus.CREATED);
+        return  lotteryService.createLottery(request);
     }
 
     @PostMapping(value = "/users/{userId}/lotteries/{ticketId}")
-    public ResponseEntity<LotteryPurchaseReponse> purchaseTicket(
+    @ResponseStatus(HttpStatus.CREATED)
+    public LotteryPurchaseReponse purchaseTicket(
             @PathVariable(value = "userId") @TenDigitUser String userId,
             @PathVariable(value = "ticketId") @SixDigitTicket String ticketId){
 

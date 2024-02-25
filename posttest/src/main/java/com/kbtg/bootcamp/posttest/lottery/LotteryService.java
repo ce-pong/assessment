@@ -2,18 +2,29 @@ package com.kbtg.bootcamp.posttest.lottery;
 
 import com.kbtg.bootcamp.posttest.exception.InternalServerException;
 
+import com.kbtg.bootcamp.posttest.user.User;
+import com.kbtg.bootcamp.posttest.user.UserRepository;
+import com.kbtg.bootcamp.posttest.user.UserTicketRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class LotteryService {
     private final LotteryRepository lotteryRepository;
 
-    public LotteryService(LotteryRepository lotteryRepository){
+    private final UserTicketRepository userTicketRepository;
+
+    private final UserRepository userRepository;
+
+    public LotteryService(LotteryRepository lotteryRepository, UserTicketRepository userTicketRepository, UserRepository userRepository) {
         this.lotteryRepository = lotteryRepository;
+        this.userTicketRepository = userTicketRepository;
+        this.userRepository = userRepository;
     }
 
     public Boolean checkValidTicket(String ticket){
@@ -49,4 +60,9 @@ public class LotteryService {
 
     }
 
+    @Transactional
+    public LotteryPurchaseReponse purchaseLottery(String userId,String ticketId){
+
+        return null;
+    }
 }

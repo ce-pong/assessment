@@ -14,4 +14,27 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private List<UserTicket> tickets;
+
+    public User() {
+    }
+
+    public User(String userId) {
+        this.userId = userId;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public List<UserTicket> getTickets() {
+        return tickets;
+    }
+
+    public void setTickets(List<UserTicket> tickets) {
+        this.tickets = tickets;
+    }
 }

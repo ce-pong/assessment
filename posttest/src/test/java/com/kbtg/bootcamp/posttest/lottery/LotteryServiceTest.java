@@ -1,15 +1,19 @@
 package com.kbtg.bootcamp.posttest.lottery;
 
 import com.kbtg.bootcamp.posttest.exception.InternalServerException;
-import org.junit.jupiter.api.BeforeEach;
+import com.kbtg.bootcamp.posttest.user.User;
+import com.kbtg.bootcamp.posttest.user.UserRepository;
+import com.kbtg.bootcamp.posttest.user.UserTicket;
+import com.kbtg.bootcamp.posttest.user.UserTicketRepository;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.ResponseEntity;
+
+import org.springframework.boot.test.context.SpringBootTest;
+
 
 import java.util.Collections;
 import java.util.List;
@@ -18,21 +22,24 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+@SpringBootTest
 class LotteryServiceTest {
 
+    @Mock
     private LotteryRepository lotteryRepository;
 
-    private LotteryService lotteryService;
+    @Mock
+    private UserTicketRepository userTicketRepository;
 
-    @BeforeEach
-    void setUp() {
-        lotteryRepository = Mockito.mock(LotteryRepository.class);
-        lotteryService = new LotteryService(lotteryRepository);
-    }
+    @Mock
+    private UserRepository userRepository;
+
+    @InjectMocks
+    private LotteryService lotteryService;
 
     @Test
     @DisplayName("Get Available Ticket IDs With No Data Should Return Empty List Response")
-    void getAvailableTicketIds_withNoData_ShouldReturnResponseWithEmptyList() {
+    void whenGetAvailableTicket_withNoData_ShouldReturnResponseWithEmptyList() {
         // Arrange
         when(lotteryRepository.findByAmountMoreThanZero()).thenReturn(Collections.emptyList());
 
@@ -46,7 +53,7 @@ class LotteryServiceTest {
 
     @Test
     @DisplayName("Get Available Ticket IDs With Data Should Return Correctly List Of Ticket Id")
-    void getAvailableTicketIds_withNoData_ShouldReturnResponseWithListStringTicketId() {
+    void gwhenGetAvailableTicket_withData_ShouldReturnResponseWithListStringTicketId() {
         // Arrange
         Lottery lottery1 = new Lottery();
         lottery1.setTicketId("000001");
@@ -83,7 +90,7 @@ class LotteryServiceTest {
 
     @Test
     @DisplayName("Add lottery should return lottery response")
-    void whenAddLottery_ShouldReturnLotteryResponseWithTicket(){
+    void whenCreateLottery_ShouldReturnLotteryResponseWithTicket(){
         // Arrange
         LotteryDto request = new LotteryDto("000001",80,1);
         Lottery lottery = new Lottery("000001",80,1);
@@ -105,5 +112,29 @@ class LotteryServiceTest {
 
         // Act & Assert
         assertThrows(InternalServerException.class, () -> {lotteryService.createLottery(request);});
+    }
+
+    @Test
+    @DisplayName("Purchase lottery should be return id from User_ticket")
+    void whenPurchaseLottery_ShouldReturnLotteryPurchaseResponseWithUserTicketId(){
+
+        // Arrange
+        String userId = "0123456789";
+        User user = new User(userId);
+        String ticket = "000001";
+        Lottery lottery = new Lottery(ticket,80,1);
+        UserTicket userTicket = new UserTicket();
+        userTicket.setId(1);
+        userTicket.setUser(user);
+        userTicket.setLottery(lottery);
+
+        when(userTicketRepository.save(any(UserTicket.class))).thenReturn(userTicket);
+
+        // Act
+        LotteryPurchaseReponse actual = lotteryService.purchaseLottery(userId,ticket);
+
+        // Assert
+        int expected = 1;
+        assertEquals(expected,actual.id());
     }
 }

@@ -18,4 +18,28 @@ public class UserTicket {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public Lottery getLottery() {
+        return lottery;
+    }
+
+    public void setLottery(Lottery lottery) {
+        this.lottery = lottery;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 }
