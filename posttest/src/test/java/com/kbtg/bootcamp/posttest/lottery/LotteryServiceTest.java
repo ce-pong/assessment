@@ -9,11 +9,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
 
 import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 class LotteryServiceTest {
@@ -71,11 +73,37 @@ class LotteryServiceTest {
 
     @Test
     @DisplayName("Handling Internal Server Error When Retrieving Available Tickets")
-    void shouldThrowInternalServerException_WhenRetrievingTicketsFails() {
+    void whenRetrievingTicketsFails_ShouldThrowInternalServerException() {
         // Arrange
         when(lotteryRepository.findByAmountMoreThanZero()).thenThrow(new RuntimeException("Database connection error"));
 
         // Act & Assert
         assertThrows(InternalServerException.class, () -> {lotteryService.getAvailableTicketIds();});
+    }
+
+    @Test
+    @DisplayName("Add lottery should return lottery response")
+    void whenAddLottery_ShouldReturnLotteryResponseWithTicket(){
+        // Arrange
+        LotteryDto request = new LotteryDto("000001",80,1);
+        Lottery lottery = new Lottery("000001",80,1);
+        when(lotteryRepository.save(any(Lottery.class))).thenReturn(lottery);
+
+        // Act
+        LotteryResponse actual = lotteryService.createLottery(request);
+
+        // Assert
+        assertEquals("000001",actual.ticket());
+    }
+
+    @Test
+    @DisplayName("Handling Internal Server Error When Create Lottery")
+    void whenCreateLotteryFails_ShouldThrowInternalServerException() {
+        // Arrange
+        LotteryDto request = new LotteryDto("000001",80,1);
+        when(lotteryRepository.save(any(Lottery.class))).thenThrow(new RuntimeException("Database connection error"));
+
+        // Act & Assert
+        assertThrows(InternalServerException.class, () -> {lotteryService.createLottery(request);});
     }
 }

@@ -1,10 +1,10 @@
 package com.kbtg.bootcamp.posttest.lottery;
 
 import com.kbtg.bootcamp.posttest.exception.InternalServerException;
+
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,6 +28,22 @@ public class LotteryService {
         }catch(Exception ex){
             throw new InternalServerException("Failed to get available ticket");
         }
+    }
+
+    public LotteryResponse createLottery(LotteryDto request){
+        try{
+            Lottery lottery = new Lottery();
+            lottery.setTicketId(request.ticket());
+            lottery.setPrice(request.price());
+            lottery.setAmount(request.amount());
+
+            lotteryRepository.save(lottery);
+
+            return new LotteryResponse(lottery.getTicketId());
+        }catch (Exception ex){
+            throw new InternalServerException("Failed to get create lottery");
+        }
+
     }
 
 }
