@@ -2,8 +2,11 @@ package com.kbtg.bootcamp.posttest.lottery;
 
 import com.kbtg.bootcamp.posttest.exception.InternalServerException;
 
+import com.kbtg.bootcamp.posttest.exception.LotteryRunOutException;
+import com.kbtg.bootcamp.posttest.exception.NotFoundException;
 import com.kbtg.bootcamp.posttest.user.User;
 import com.kbtg.bootcamp.posttest.user.UserRepository;
+import com.kbtg.bootcamp.posttest.user.UserTicket;
 import com.kbtg.bootcamp.posttest.user.UserTicketRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,9 +30,6 @@ public class LotteryService {
         this.userRepository = userRepository;
     }
 
-    public Boolean checkValidTicket(String ticket){
-        return true;
-    }
     public LotteryListResponse getAvailableTicketIds() {
         try{
             List<Lottery> tickets = lotteryRepository.findByAmountMoreThanZero();
@@ -63,6 +63,42 @@ public class LotteryService {
     @Transactional
     public LotteryPurchaseReponse purchaseLottery(String userId,String ticketId){
 
-        return null;
+        Optional<Lottery> optionalLottery = lotteryRepository.findById(ticketId);
+        Lottery lottery;
+        if(optionalLottery.isEmpty()){
+            throw new NotFoundException("Ticket "+ticketId+" not found");
+        }
+
+        lottery = optionalLottery.get();
+
+        if(lottery.getAmount() == 0){
+            throw new LotteryRunOutException("Ticket "+ticketId+" has already been purchased");
+        }
+
+        UserTicket userTicket;
+        try{
+            User user;
+            Optional<User> optionalUser = userRepository.findById(userId);
+            if(optionalUser.isEmpty()){
+                user = new User(userId);
+                userRepository.save(user);
+            }else{
+                user = optionalUser.get();
+            }
+
+            // create purchase record
+            userTicket = new UserTicket(lottery,user);
+            userTicket = userTicketRepository.save(userTicket);
+
+            // discount from storage
+            lottery.setAmount(lottery.getAmount()-1);
+            lotteryRepository.save(lottery);
+
+        }catch (Exception ex){
+            throw new InternalServerException("Failed to purchase lottery");
+        }
+
+        String recordId = Integer.toString(userTicket.getId());
+        return new LotteryPurchaseReponse(recordId);
     }
 }

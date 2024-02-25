@@ -1,4 +1,4 @@
 package com.kbtg.bootcamp.posttest.lottery;
 
-public record LotteryPurchaseReponse(int id) {
+public record LotteryPurchaseReponse(String id) {
 }

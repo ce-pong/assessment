@@ -19,6 +19,14 @@ public class UserTicket {
     @JoinColumn(name = "user_id")
     private User user;
 
+    public UserTicket() {
+    }
+
+    public UserTicket(Lottery lottery, User user) {
+        this.lottery = lottery;
+        this.user = user;
+    }
+
     public int getId() {
         return id;
     }

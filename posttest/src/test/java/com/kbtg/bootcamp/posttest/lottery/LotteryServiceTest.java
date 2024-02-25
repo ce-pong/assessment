@@ -1,6 +1,8 @@
 package com.kbtg.bootcamp.posttest.lottery;
 
 import com.kbtg.bootcamp.posttest.exception.InternalServerException;
+import com.kbtg.bootcamp.posttest.exception.LotteryRunOutException;
+import com.kbtg.bootcamp.posttest.exception.NotFoundException;
 import com.kbtg.bootcamp.posttest.user.User;
 import com.kbtg.bootcamp.posttest.user.UserRepository;
 import com.kbtg.bootcamp.posttest.user.UserTicket;
@@ -17,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -53,7 +56,7 @@ class LotteryServiceTest {
 
     @Test
     @DisplayName("Get Available Ticket IDs With Data Should Return Correctly List Of Ticket Id")
-    void gwhenGetAvailableTicket_withData_ShouldReturnResponseWithListStringTicketId() {
+    void whenGetAvailableTicket_withData_ShouldReturnResponseWithListStringTicketId() {
         // Arrange
         Lottery lottery1 = new Lottery();
         lottery1.setTicketId("000001");
@@ -115,26 +118,72 @@ class LotteryServiceTest {
     }
 
     @Test
-    @DisplayName("Purchase lottery should be return id from User_ticket")
-    void whenPurchaseLottery_ShouldReturnLotteryPurchaseResponseWithUserTicketId(){
+    @DisplayName("Purchase lottery throws NotFoundException if ticket is not found")
+    void whenPurchaseLottery_withNoTicket_ShouldReturnNotFound(){
 
         // Arrange
-        String userId = "0123456789";
-        User user = new User(userId);
         String ticket = "000001";
+        String userId = "0123456789";
         Lottery lottery = new Lottery(ticket,80,1);
-        UserTicket userTicket = new UserTicket();
-        userTicket.setId(1);
-        userTicket.setUser(user);
-        userTicket.setLottery(lottery);
 
+        when(lotteryRepository.findById(ticket)).thenReturn(Optional.empty());
+
+
+        // Act & Assert
+        Exception exception = assertThrows(NotFoundException.class, () -> {
+            lotteryService.purchaseLottery(userId,ticket);
+        });
+
+        String actualMessage = exception.getMessage();
+        String expectedMessage = "Ticket "+ticket+" not found";
+
+        assertEquals(expectedMessage,actualMessage);
+    }
+
+    @Test
+    @DisplayName("Purchase lottery throws LotteryRunOutException if ticket is already purchased")
+    void whenPurchaseLottery_withTicketRunOut_ShouldReturnRunOutException(){
+
+        // Arrange
+        String ticket = "000001";
+        String userId = "0123456789";
+        Lottery lottery = new Lottery(ticket,80,0);
+
+        when(lotteryRepository.findById(ticket)).thenReturn(Optional.of(lottery));
+
+
+        // Act & Assert
+        Exception exception = assertThrows(LotteryRunOutException.class, () -> {
+            lotteryService.purchaseLottery(userId,ticket);
+        });
+
+        String actualMessage = exception.getMessage();
+        String expectedMessage = "Ticket "+ticket+" has already been purchased";
+
+        assertEquals(expectedMessage,actualMessage);
+    }
+
+    @Test
+    @DisplayName("Purchase lottery return LotteryPurchaseResponse with UserTicketId")
+    void whenPurchaseLottery_ShouldReturnResponseWithUserTicketId(){
+
+        // Arrange
+        String ticket = "000001";
+        String userId = "0123456789";
+        Lottery lottery = new Lottery(ticket,80,1);
+        User user = new User(userId);
+        UserTicket userTicket = new UserTicket(lottery,user);
+        userTicket.setId(1);
+
+        when(lotteryRepository.findById(ticket)).thenReturn(Optional.of(lottery));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(userTicketRepository.save(any(UserTicket.class))).thenReturn(userTicket);
 
         // Act
         LotteryPurchaseReponse actual = lotteryService.purchaseLottery(userId,ticket);
 
         // Assert
-        int expected = 1;
+        String expected = "1";
         assertEquals(expected,actual.id());
     }
 }

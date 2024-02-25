@@ -9,6 +9,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@Validated
 public class LotteryController {
 
     private LotteryService lotteryService;
@@ -37,6 +38,6 @@ public class LotteryController {
             @PathVariable(value = "userId") @TenDigitUser String userId,
             @PathVariable(value = "ticketId") @SixDigitTicket String ticketId){
 
-        return null;
+        return lotteryService.purchaseLottery(userId,ticketId);
     }
 }
