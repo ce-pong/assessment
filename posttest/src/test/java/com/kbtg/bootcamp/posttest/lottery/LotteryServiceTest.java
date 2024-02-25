@@ -40,6 +40,7 @@ class LotteryServiceTest {
     @InjectMocks
     private LotteryService lotteryService;
 
+
     @Test
     @DisplayName("Get Available Ticket IDs With No Data Should Return Empty List Response")
     void whenGetAvailableTicket_withNoData_ShouldReturnResponseWithEmptyList() {
@@ -55,19 +56,19 @@ class LotteryServiceTest {
     }
 
     @Test
-    @DisplayName("Get Available Ticket IDs With Data Should Return Correctly List Of Ticket Id")
-    void whenGetAvailableTicket_withData_ShouldReturnResponseWithListStringTicketId() {
+    @DisplayName("Get Available Ticket IDs With Data Should Return Correctly List Of Ticket Id Ascending")
+    void whenGetAvailableTicket_withData_ShouldReturnResponseWithListStringTicketId_Ascending() {
         // Arrange
         Lottery lottery1 = new Lottery();
-        lottery1.setTicketId("000001");
+        lottery1.setTicketId("000002");
         lottery1.setAmount(1);
 
         Lottery lottery2 = new Lottery();
-        lottery2.setTicketId("000002");
+        lottery2.setTicketId("123456");
         lottery2.setAmount(1);
 
         Lottery lottery3 = new Lottery();
-        lottery3.setTicketId("123456");
+        lottery3.setTicketId("000001");
         lottery3.setAmount(1);
 
         when(lotteryRepository.findByAmountMoreThanZero()).thenReturn(List.of(lottery1,lottery2,lottery3));
@@ -88,7 +89,7 @@ class LotteryServiceTest {
         when(lotteryRepository.findByAmountMoreThanZero()).thenThrow(new RuntimeException("Database connection error"));
 
         // Act & Assert
-        assertThrows(InternalServerException.class, () -> {lotteryService.getAvailableTicketIds();});
+        assertThrows(InternalServerException.class, () -> lotteryService.getAvailableTicketIds());
     }
 
     @Test
@@ -114,7 +115,7 @@ class LotteryServiceTest {
         when(lotteryRepository.save(any(Lottery.class))).thenThrow(new RuntimeException("Database connection error"));
 
         // Act & Assert
-        assertThrows(InternalServerException.class, () -> {lotteryService.createLottery(request);});
+        assertThrows(InternalServerException.class, () -> lotteryService.createLottery(request));
     }
 
     @Test
@@ -124,15 +125,12 @@ class LotteryServiceTest {
         // Arrange
         String ticket = "000001";
         String userId = "0123456789";
-        Lottery lottery = new Lottery(ticket,80,1);
 
         when(lotteryRepository.findById(ticket)).thenReturn(Optional.empty());
 
 
         // Act & Assert
-        Exception exception = assertThrows(NotFoundException.class, () -> {
-            lotteryService.purchaseLottery(userId,ticket);
-        });
+        Exception exception = assertThrows(NotFoundException.class, () -> lotteryService.purchaseLottery(userId,ticket));
 
         String actualMessage = exception.getMessage();
         String expectedMessage = "Ticket "+ticket+" not found";
@@ -153,9 +151,7 @@ class LotteryServiceTest {
 
 
         // Act & Assert
-        Exception exception = assertThrows(LotteryRunOutException.class, () -> {
-            lotteryService.purchaseLottery(userId,ticket);
-        });
+        Exception exception = assertThrows(LotteryRunOutException.class, () -> lotteryService.purchaseLottery(userId,ticket));
 
         String actualMessage = exception.getMessage();
         String expectedMessage = "Ticket "+ticket+" has already been purchased";

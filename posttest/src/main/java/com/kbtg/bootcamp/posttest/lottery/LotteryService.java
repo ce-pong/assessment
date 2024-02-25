@@ -8,12 +8,12 @@ import com.kbtg.bootcamp.posttest.user.User;
 import com.kbtg.bootcamp.posttest.user.UserRepository;
 import com.kbtg.bootcamp.posttest.user.UserTicket;
 import com.kbtg.bootcamp.posttest.user.UserTicketRepository;
+import org.apache.logging.log4j.util.PropertySource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,20 +30,26 @@ public class LotteryService {
         this.userRepository = userRepository;
     }
 
+    private List<Lottery> orderLotteryAscending(List<Lottery> lotteries){
+        List<Lottery> mutableList = new ArrayList<>(lotteries);
+        mutableList.sort(Comparator.comparingInt(lottery -> Integer.parseInt(lottery.getTicketId())));
+        return mutableList;
+    }
+
     public LotteryListResponse getAvailableTicketIds() {
+        List<Lottery> lotteries;
         try{
-            List<Lottery> tickets = lotteryRepository.findByAmountMoreThanZero();
-
-            List<String> ticketIds =  tickets.stream()
-                    .map(Lottery::getTicketId)
-                    .collect(Collectors.toList());
-
-            return new LotteryListResponse(ticketIds);
+            lotteries = lotteryRepository.findByAmountMoreThanZero();
         }catch(Exception ex){
             throw new InternalServerException("Failed to get available ticket");
         }
-    }
 
+        List<String> ticketIds =  orderLotteryAscending(lotteries).stream()
+                .map(Lottery::getTicketId)
+                .collect(Collectors.toList());
+
+        return new LotteryListResponse(ticketIds);
+    }
     public LotteryResponse createLottery(LotteryDto request){
         try{
             Lottery lottery = new Lottery();
