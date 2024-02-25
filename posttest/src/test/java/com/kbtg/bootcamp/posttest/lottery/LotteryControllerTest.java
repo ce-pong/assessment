@@ -100,7 +100,7 @@ class LotteryControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.message").value("Validation error"));
+                .andExpect(jsonPath("$.message").isNotEmpty());
     }
 
 

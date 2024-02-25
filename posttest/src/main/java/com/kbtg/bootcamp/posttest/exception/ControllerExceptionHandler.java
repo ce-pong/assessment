@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.stream.Collectors;
 
 
@@ -32,12 +33,16 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(value = {MethodArgumentNotValidException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiErrorResponse handleValidationExceptions(MethodArgumentNotValidException exception, WebRequest request) {
+        List<String> error = exception.getFieldErrors()
+                .stream()
+                .map(f -> f.getField()  + " " + f.getDefaultMessage())
+                .toList();
 
         return  new ApiErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
                 HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                "Validation error",
+                String.join(",",error),
                 request.getDescription(false)
         );
     }
