@@ -180,7 +180,7 @@ class LotteryServiceTest {
         when(userTicketRepository.save(any(UserTicket.class))).thenReturn(userTicket);
 
         // Act
-        LotteryPurchaseReponse actual = lotteryService.purchaseLottery(userId,ticket);
+        LotteryPurchaseResponse actual = lotteryService.purchaseLottery(userId,ticket);
 
         // Assert
         String expected = "1";

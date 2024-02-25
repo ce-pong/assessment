@@ -1,10 +1,7 @@
 package com.kbtg.bootcamp.posttest.lottery;
 
 import com.kbtg.bootcamp.posttest.user.TenDigitUser;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Pattern;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,7 +31,7 @@ public class LotteryController {
 
     @PostMapping(value = "/users/{userId}/lotteries/{ticketId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public LotteryPurchaseReponse purchaseTicket(
+    public LotteryPurchaseResponse purchaseTicket(
             @PathVariable(value = "userId") @TenDigitUser String userId,
             @PathVariable(value = "ticketId") @SixDigitTicket String ticketId){
 

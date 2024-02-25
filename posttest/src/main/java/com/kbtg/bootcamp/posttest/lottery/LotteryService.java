@@ -61,7 +61,7 @@ public class LotteryService {
     }
 
     @Transactional
-    public LotteryPurchaseReponse purchaseLottery(String userId,String ticketId){
+    public LotteryPurchaseResponse purchaseLottery(String userId, String ticketId){
 
         Optional<Lottery> optionalLottery = lotteryRepository.findById(ticketId);
         Lottery lottery;
@@ -99,6 +99,6 @@ public class LotteryService {
         }
 
         String recordId = Integer.toString(userTicket.getId());
-        return new LotteryPurchaseReponse(recordId);
+        return new LotteryPurchaseResponse(recordId);
     }
 }
