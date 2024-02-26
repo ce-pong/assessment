@@ -12,6 +12,9 @@ public class User {
     @Id
     private String userId;
 
+    public User() {
+    }
+
     public User(String userId) {
         this.userId = userId;
     }
