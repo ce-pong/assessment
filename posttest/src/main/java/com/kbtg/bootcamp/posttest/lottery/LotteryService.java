@@ -29,21 +29,6 @@ public class LotteryService {
         this.userRepository = userRepository;
     }
 
-    public LotteryListResponse getAvailableTicketIds() {
-        List<Lottery> lotteries;
-        try{
-            lotteries = lotteryRepository.findByAmountMoreThanZero();
-        }catch(Exception ex){
-            throw new InternalServerException("Failed to get available ticket");
-        }
-
-        List<String> ticketIds =  lotteries.stream()
-                .sorted(Comparator.comparingInt(lottery -> Integer.parseInt(lottery.getTicketId())))
-                .map(Lottery::getTicketId)
-                .collect(Collectors.toList());
-
-        return new LotteryListResponse(ticketIds);
-    }
     public LotteryResponse addLottery(LotteryDto request){
         try{
             Lottery lottery = new Lottery();
@@ -58,6 +43,22 @@ public class LotteryService {
             throw new InternalServerException("Failed to get create lottery");
         }
 
+    }
+
+    public LotteryListResponse getAvailableTicketIds() {
+        List<Lottery> lotteries;
+        try{
+            lotteries = lotteryRepository.findByAmountMoreThanZero();
+        }catch(Exception ex){
+            throw new InternalServerException("Failed to get available ticket");
+        }
+
+        List<String> ticketIds =  lotteries.stream()
+                .sorted(Comparator.comparingInt(lottery -> Integer.parseInt(lottery.getTicketId())))
+                .map(Lottery::getTicketId)
+                .collect(Collectors.toList());
+
+        return new LotteryListResponse(ticketIds);
     }
 
     @Transactional
@@ -101,6 +102,7 @@ public class LotteryService {
         List<UserTicket> userTickets = userTicketRepository.findByUserId(userId);
 
         List<String> ticketIds = new ArrayList<>();
+
         int sum = userTickets.stream()
                 .map(UserTicket::getLottery)
                 .sorted(Comparator.comparingInt(lottery -> Integer.parseInt(lottery.getTicketId())))
@@ -111,7 +113,6 @@ public class LotteryService {
         return new LotteryHistoryResponse(ticketIds,userTickets.size(),sum);
     }
 
-    @Transactional
     public LotterySellBackResponse sellBackLottery(String userId, String ticketId) {
             List<UserTicket> userTickets = userTicketRepository.findByUserIdAndTicketId(userId,ticketId);
 

@@ -15,13 +15,7 @@ public class LotteryController {
         this.lotteryService = lotteryService;
     }
 
-    @GetMapping(value = "/lotteries")
-    @ResponseStatus(value = HttpStatus.OK)
-    public LotteryListResponse getAvailableLottery(){
-
-        return lotteryService.getAvailableTicketIds();
-    }
-
+    // EXP01
     @PostMapping(value = "/admin/lotteries")
     @ResponseStatus(HttpStatus.CREATED)
     public LotteryResponse createLottery(@RequestBody @Validated LotteryDto request){
@@ -29,14 +23,15 @@ public class LotteryController {
         return  lotteryService.addLottery(request);
     }
 
-    @GetMapping(value = "/users/{userId}/lotteries")
-    @ResponseStatus(HttpStatus.OK)
-    public LotteryHistoryResponse getPurchaseHistory(
-            @PathVariable(value = "userId") @TenDigitUser String userId){
+    // EXP02
+    @GetMapping(value = "/lotteries")
+    @ResponseStatus(value = HttpStatus.OK)
+    public LotteryListResponse getAvailableLottery(){
 
-        return lotteryService.getPurchaseHistory(userId);
+        return lotteryService.getAvailableTicketIds();
     }
 
+    // EXP03
     @PostMapping(value = "/users/{userId}/lotteries/{ticketId}")
     @ResponseStatus(HttpStatus.CREATED)
     public LotteryPurchaseResponse purchaseLottery(
@@ -46,8 +41,19 @@ public class LotteryController {
         return lotteryService.purchaseLottery(userId,ticketId);
     }
 
+
+    // EXP04
+    @GetMapping(value = "/users/{userId}/lotteries")
+    @ResponseStatus(HttpStatus.OK)
+    public LotteryHistoryResponse getPurchaseHistory(
+            @PathVariable(value = "userId") @TenDigitUser String userId){
+
+        return lotteryService.getPurchaseHistory(userId);
+    }
+
+    // EXP05
     @DeleteMapping(value = "/users/{userId}/lotteries/{ticketId}")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.OK)
     public LotterySellBackResponse sellBackLottery(
             @PathVariable(value = "userId") @TenDigitUser String userId,
             @PathVariable(value = "ticketId") @SixDigitTicket String ticketId){
