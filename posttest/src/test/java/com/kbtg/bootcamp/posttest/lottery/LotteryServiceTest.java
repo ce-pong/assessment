@@ -11,10 +11,12 @@ import com.kbtg.bootcamp.posttest.user.UserTicketRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ActiveProfiles;
 
 
 import java.util.Collections;
@@ -26,18 +28,19 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
+@ActiveProfiles("test")
 class LotteryServiceTest {
 
-    @Mock
+    @MockBean
     private LotteryRepository lotteryRepository;
 
-    @Mock
+    @MockBean
     private UserTicketRepository userTicketRepository;
 
-    @Mock
+    @MockBean
     private UserRepository userRepository;
 
-    @InjectMocks
+    @Autowired
     private LotteryService lotteryService;
 
     //region EXP01
